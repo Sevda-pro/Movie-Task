@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <style>
+        .list {
+            display: flex;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="FORDIV">
+        <form class="form-inline my-2 my-lg-0" action="submit" id="loginForm">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+
+        </form>
+        <button class="btn btn-outline-success my-2 my-sm-0   list" id="list" onclick="listbutton()"
+            type="submit">Favourite List</button>
+    </div>
+    <div id="new">
+
+    </div>
+
+    <div id="here"></div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const loginForm = document.querySelector("#loginForm");
+        const newelement = document.querySelector("#new");
+        loginForm.addEventListener("submit", formsubmit);
+        let Title;
+        async function formsubmit(e) {
+            e.preventDefault();
+            try {
+                let res = await axios.get("http://www.omdbapi.com/?i=tt3896198&apikey=e2ee7c3b");
+                console.log(res.data);
+                Title = res.data.Title;
+                let div = document.createElement('div')
+                div.innerHTML = `
+                 <div>${res.data.Title}</div>
+                <div> ${res.data.Year}</div>
+                <div> ${res.data.Type}</div>
+                <img src="${res.data.Poster}" alt="Movie Poster">
+                <button type="button" class="btn btn-success" id="favourite" onclick="favouritebutton()">Add to favourite</button>`
+
+
+                newelement.appendChild(div);
+
+
+            } catch (error) {
+                console.log(error);
+                let errorDiv = document.querySelector("#errordiv");
+                // errorDiv.classList = "error";
+                errorDiv.textContent = error.message;
+                document.body.appendChild(errorDiv);
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 3001);
+            }
+        }
+
+        // const favourite = document.querySelector("#favourite");
+        // favourite.addEventListener("click", favouritebutton);
+        async function favouritebutton() {
+
+
+            try {
+                let loginobj = {
+                    Movie: Title,
+                };
+                console.log(loginobj);
+
+                let res = await axios.post("http://localhost:3001/submit", loginobj);
+                if (res.status == 200) {
+                   console.log("data saved")
+                }
+            } catch (error) {
+                console.log(error);
+                let errorDiv = document.querySelector("#errordiv");
+                // errorDiv.classList = "error";
+                errorDiv.textContent = error.message;
+                document.body.appendChild(errorDiv);
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 3001);
+            }
+        }
+
+        async function listbutton() {
+
+
+            try {
+                window.location.href = "/all";
+                let res = await axios.get("http://localhost:3001/all");
+                if (res.status == 200) {
+                 console.log(res.result.Movie)
+                }
+            } catch (error) {
+                console.log(error);
+                let errorDiv = document.querySelector("#errordiv");
+                // errorDiv.classList = "error";
+                errorDiv.textContent = error.message;
+                document.body.appendChild(errorDiv);
+                setTimeout(() => {
+                    errorDiv.remove();
+                }, 3001);
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>
